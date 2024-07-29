@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const blogSchema = z.object({
   user_id: z.number().int().nonnegative().describe("User ID must be a non-negative integer"),
-  title: z.string().max(55, "Title must be 55 characters or less").min(10, "Title must be atleast 10 characters"),
+  title: z.string().max(100, "Title must be 100 characters or less").min(30, "Title must be atleast 30 characters"),
   img: z.string().max(255, "Image URL must be 255 characters or less"),
   published_at: z.string().transform((str) => new Date(str)).describe("Published date must be in datetime format").optional(),
   likes: z.number().int().nonnegative().default(0).describe("Likes must be a non-negative integer").optional(),

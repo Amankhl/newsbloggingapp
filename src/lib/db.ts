@@ -26,3 +26,10 @@ export type Blog = {
   comments_count: number;
   category_id: number;
 };
+
+export type SigninUser = {
+  name: string;
+  email: string;
+  password: string;
+  username: string;
+}

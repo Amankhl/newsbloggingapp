@@ -1,5 +1,5 @@
 import {NextRequest, NextResponse} from "next/server"
-import pool, { Blog }  from '@/config/db';
+import pool, { Blog }  from '@/lib/db';
 import { blogSchema } from '@/schemas/blogSchema';
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { parseBody } from "@/helpers/requestParser";
