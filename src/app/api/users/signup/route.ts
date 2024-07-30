@@ -37,10 +37,11 @@ export async function POST(request: NextRequest) {
             }else{                                          // if user is not verified but the email already exists, then we will send a verification email with the code
                 const hashedPassword = await bcrypt.hash(user.password, 10);
                 const expiryDate = new Date(Date.now() + 3600000);   // 1 hr expiry time
+
                 const [result] = await pool.execute<ResultSetHeader>(
                     'UPDATE users SET password = ?, verifyCode = ?, verifyCodeExpiry = ? WHERE email = ?',
                     [hashedPassword, verifyCode, expiryDate, user.email]
-                );
+                );//after this, it will exit the condition and send the verification email by executing the sendVerificationEmail function
             }
 
         } else {
@@ -50,20 +51,20 @@ export async function POST(request: NextRequest) {
             expiryDate.setHours(expiryDate.getHours() + 1); // 1 hr expiry time but a different way
 
             const [result] = await pool.execute<ResultSetHeader>(
-                'INSERT INTO users (name, username, email, password, isVerified, verifyCode, verifyCodeExpiry) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                [user.name, user.username, user.email, hashedPassword, 1, verifyCode, expiryDate]
+                'INSERT INTO users (name, username, email, password, verifyCode, verifyCodeExpiry) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [user.name, user.username, user.email, hashedPassword, verifyCode, expiryDate]
             );
         }
             // send a verification email
-            const emailResponse = await sendVerificationEmail(user.email, user.username, verifyCode);
-            if(!emailResponse.success){
-                return NextResponse.json({ success: false, message: emailResponse.message }, { status: 500 });
-            }
+            // const emailResponse = await sendVerificationEmail(user.email, user.username, verifyCode);
+            // if(!emailResponse.success){
+            //     return NextResponse.json({ success: false, message: emailResponse.message }, { status: 500 });
+            // }
             return NextResponse.json({ success: true, message: 'User registered successfully. Verification email sent.' }, { status: 201 });
 
     } catch (error) {
         console.error("Error registering user", error);
-        return NextResponse.json({ success: false, message: 'Failed to register user' }, { status: 500 });
+        return NextResponse.json({ success: false, message: 'Failed to register user', error }, { status: 500 });
     }
 
 }

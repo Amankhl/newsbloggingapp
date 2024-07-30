@@ -33,3 +33,8 @@ export type SigninUser = {
   password: string;
   username: string;
 }
+
+export type loginUser = {
+  identifier: string;
+  password: string;
+}
