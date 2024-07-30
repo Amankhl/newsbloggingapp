@@ -7,8 +7,9 @@ export async function POST(req: NextRequest){
     try {
         const { username, code} = await req.json();
 
-        const { code: validCode } = verifyemailSchema.parse({ code });
-
+        const { code: validCode } = verifyemailSchema.parse({ code });  // sending code in a object so it work with the defined schema which was defined for object
+        //destructuring and renaming the value
+        
         const decodedUsername = decodeURIComponent(username);  // sometimes the space or other characters denoted as %20%
 
         const [userByUsername] = await pool.execute<RowDataPacket[]>(

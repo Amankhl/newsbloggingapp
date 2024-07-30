@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         );
         if (existingUserByUsername.length > 0) {
             const existingUser = existingUserByUsername[0];
-            if (existingUser) {
+            if (existingUser.isVerified === 1) {
                 return NextResponse.json({ success: false, message: 'Username already taken' }, { status: 400 });
             }
         }
