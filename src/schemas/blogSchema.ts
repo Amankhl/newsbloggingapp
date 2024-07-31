@@ -1,14 +1,21 @@
 import { z } from 'zod';
 
+const userIdSchema = z.number().int().nonnegative().describe("User ID must be a non-negative integer")
+
 const blogSchema = z.object({
-  user_id: z.number().int().nonnegative().describe("User ID must be a non-negative integer"),
   title: z.string().max(100, "Title must be 100 characters or less").min(30, "Title must be atleast 30 characters"),
-  img: z.string().max(255, "Image URL must be 255 characters or less"),
-  published_at: z.string().transform((str) => new Date(str)).describe("Published date must be in datetime format").optional(),
-  likes: z.number().int().nonnegative().default(0).describe("Likes must be a non-negative integer").optional(),
-  content: z.string().describe("Content is required"),
-  comments_count: z.number().int().nonnegative().default(0).describe("Comments count must be a non-negative integer").optional(),
   category_id: z.number().int().nonnegative().describe("Category ID must be a non-negative integer"),
+  content: z.string().describe("Content is required"),
+  img: z.string().max(255, "Image URL must be 255 characters or less"),
+});
+  
+const IdQuerySchema = z.object({
+  uid: userIdSchema 
+})
+
+const SORTBY_OPTIONS = ["likes", "comments", "latest"] as const;
+const sortbyQuerySchema = z.object({
+  sortby: z.enum(SORTBY_OPTIONS)
 });
 
-export { blogSchema };
+export { blogSchema, IdQuerySchema, sortbyQuerySchema };
