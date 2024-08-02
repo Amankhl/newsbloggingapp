@@ -1,27 +1,23 @@
 import { NextResponse, NextRequest } from 'next/server';
 import pool from "@/lib/db";
-import { blogSchema, IdQuerySchema } from "@/schemas/blogSchema";
+import { blogSchema } from "@/schemas/blogSchema";
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import jwt, { JwtPayload } from "jsonwebtoken"
 
 // only verified registered users can write blogs
 
 export async function POST(req: NextRequest) {
   try {
-    //make sure that you are also sending the id if logged in in the search params so that they can write blog in their ID
-    const { searchParams } = new URL(req.url);
-    const uidParam = searchParams.get('uid');  //query param should be like uid=1
-    const queryParam = {
-        uid: uidParam ? parseInt(uidParam, 10) : null
-    }
-    //validate with zod
-    const parsedId = IdQuerySchema.safeParse(queryParam)
-
-    if(!parsedId.success){
-        const uidErrors = parsedId.error.format().uid?._errors || [];
-        return NextResponse.json({success: false, error: parsedId.error.message, message: uidErrors?.length > 0 ? uidErrors.join(", ") : "Invalid query parameters" }, { status: 400 });
-    }
-
-    const {uid} = parsedId.data;
+    const tokenCookie = req.cookies.get('token');
+    // onlly logged in user can write blogs
+      if (!tokenCookie) {
+          return NextResponse.json({ success: false, message: 'Please Login first' }, { status: 401 });
+      }
+      const token = tokenCookie.value;
+      // Verify and decode the JWT token
+      const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET!) as JwtPayload; // Replace with your actual JWT secret
+      // Extract the user ID from the decoded token
+      const uid = decodedToken.id;
 
     const [existingUserByuid] = await pool.execute<RowDataPacket[]>(
       'SELECT * FROM users WHERE uid = ?',

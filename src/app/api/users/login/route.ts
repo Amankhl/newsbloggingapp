@@ -60,8 +60,8 @@ export async function POST(req: NextRequest) {
         return response
 
     } catch (error) {
-        console.error("Error registering user", error);
-        return NextResponse.json({ success: false, message: "error registering user" + (error as Error).message, error }, { status: 500 });
+        console.error("Failed to login ", error);
+        return NextResponse.json({ success: false, message: "Failed to login. " + (error as Error).message, error }, { status: 500 });
     }
 
 }
